@@ -190,7 +190,8 @@ function createTheme( $theme ) {
 		'local_preview' => false,
 	);
 	$theme = array_merge( $default_theme, $theme );
-      if(strpos($theme['description'],'Tags')) {
+
+      if(strpos($theme['description'],'Tags')) {
     	    $theme['description'] = substr($theme['description'],0,strpos($theme['description'],'Tags'));
         }
 	$post = array(

@@ -18,8 +18,7 @@ Author URI:
 require_once('lib/simple_html_dom.php');
 require_once('additional_function.php');
 require_once('parsing_themes.php');
-require_once('controller.php');
-
+add_action('init','init_controller');
 
 spl_autoload_register('autoloader');
 function autoloader( $class ) {
@@ -34,6 +33,8 @@ function autoloader( $class ) {
     }
 }
 
-
+function init_controller(){
+    require_once('controller.php');
+}
 
 ?>
