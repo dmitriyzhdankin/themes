@@ -3,6 +3,8 @@ class Theme {
     public $source_site = false;
     public $site_name = false;
 
+    public $page_content = false;
+
     protected $parsed_themes_table = 'themes';
     protected $local_zip_path = 'wp-content/uploads/';
 
@@ -13,6 +15,7 @@ class Theme {
     public function __construct() {
         global $wpdb;
         $this->db = $wpdb;
+        $this->db->show_errors();
 
         if( !$this->source_site || !$this->site_name ) {
             return false;
@@ -196,6 +199,24 @@ class Theme {
         $header['errmsg']=$errmsg;
         $header['content']=$content;
         return $header;
+    }
+
+    protected function get_web_page_html( $url, $post_fields = array() ) {
+        $page = $this->get_web_page( $url, $post_fields );
+        $page_content = $page['content'];
+        $this->theme_page_html = str_get_html($page_content);
+    }
+
+    protected function insertTheme($theme) {
+        $data = array(
+            'name' => $theme['name'],
+            'url' => $theme['url'],
+            'zip_url' => $theme['zip'],
+            'preview' => $theme['preview'],
+            'screenshot' => $theme['screenshot'],
+            'site_name' => $theme['site_name'],
+        );
+        return $this->db->insert($this->parsed_themes_table,$data);
     }
 
 }

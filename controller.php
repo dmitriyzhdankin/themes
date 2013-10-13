@@ -12,6 +12,19 @@ if( $url ) {
             case 'download_theme' : {
                 downloadTheme();
             }
+            case 'smthemes_get_themes' : {
+                $smt = new Smthemes();
+                $smt->getThemes();
+            }
+
+            case 'wordpress_get_filters' : {
+                $wp = new Wordpress();
+                $wp->_getFilters();
+            }
+            case 'wordpress_get_themes' : {
+                $wp = new Wordpress();
+                $wp->_getThemes();
+            }
         }
     }
 }
