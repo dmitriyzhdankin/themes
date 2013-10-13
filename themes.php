@@ -29,7 +29,7 @@ function autoloader( $class ) {
         if( file_exists( $curent_dir.$filename ) ) {
             require_once( $filename );
         } else {
-            $filename = 'source_sites/' . $class . '.php';
+            $filename = 'source_sites/' . strtolower($class) . '.php';
             if( file_exists( $curent_dir.$filename ) ) {
                 require_once( $filename );
             }
