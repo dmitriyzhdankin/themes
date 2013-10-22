@@ -24,7 +24,7 @@ class Theme {
     }
 
     public function getNotLoadedTheme() {
-        $query = 'SELECT * FROM '.$this->parsed_themes_table .' WHERE loaded = 0 AND site_name="rockkitty" LIMIT 0,1';
+        $query = 'SELECT * FROM '.$this->parsed_themes_table .' WHERE loaded = 0 LIMIT 0,1';
         $this->theme_options = $this->db->get_row( $query, ARRAY_A );
     }
 
