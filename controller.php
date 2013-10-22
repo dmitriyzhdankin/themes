@@ -17,6 +17,11 @@ if( $url ) {
                 $smt->getThemes();
             }
 
+            case 'rockkitty_get_themes' : {
+                $rk = new Rockkitty();
+                $rk->getThemes();
+            }
+
             case 'wordpress_get_filters' : {
                 $wp = new Wordpress();
                 $wp->_getFilters();

@@ -24,7 +24,7 @@ class Theme {
     }
 
     public function getNotLoadedTheme() {
-        $query = 'SELECT * FROM '.$this->parsed_themes_table .' WHERE loaded = 0 LIMIT 0,1';
+        $query = 'SELECT * FROM '.$this->parsed_themes_table .' WHERE loaded = 0 AND site_name="rockkitty" LIMIT 0,1';
         $this->theme_options = $this->db->get_row( $query, ARRAY_A );
     }
 
@@ -173,16 +173,18 @@ class Theme {
     }
 
     public function get_web_page( $url, $post_fields = array() ) {
+        $headers = array('Content-type: text/html; charset=utf-8');
         $uagent="Mozilla/5.0 (Windows; U; Windows NT 5.1; ru; rv:1.9.0.8) Gecko/2009032609 Firefox/3.0.9";
         $ch = curl_init( $url );
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($ch, CURLOPT_ENCODING, "");
+        curl_setopt($ch, CURLOPT_ENCODING, 'UTF-8');
         curl_setopt($ch, CURLOPT_USERAGENT, $uagent);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
         curl_setopt($ch, CURLOPT_MAXREDIRS, 5);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         if( $post_fields ) {
             $post_fields_string = '';
             foreach($post_fields as $key=>$value) { $post_fields_string .= $key.'='.$value.'&'; }
@@ -218,6 +220,73 @@ class Theme {
         );
         return $this->db->insert($this->parsed_themes_table,$data);
     }
+
+
+
+
+    /*******************************************/
+    /**
+     * Pager
+     */
+
+    protected function setPagesList( $pages ) {
+        $table_name = $this->db->prefix.'options';
+
+        if(is_array($pages) && !empty($pages)) {
+            if( $this->getPagesList() === null ) {
+                $this->db->insert( $table_name,  array('option_name' => $this->site_name.'_pages_list', 'option_value' => serialize($pages) ) );
+            } else {
+                $this->updatePagesList($pages);
+            }
+        } else {
+            echo '<br>Fields aren\'t found';die;
+        }
+    }
+
+    protected function getPagesList() {
+        $table_name = $this->db->prefix.'options';
+        $query = 'SELECT option_value FROM '.$table_name .' WHERE option_name = "'.$this->site_name.'_pages_list"';
+        $option = $this->db->get_var( $query );
+        if( $option && is_serialized( $option )) {
+            return unserialize($option); // not loaded pages
+        } elseif( $option === null ) {
+            return null; // any pages was not loaded
+        } elseif( $option == 1 ) {
+            return false; // all pages was loaded
+        }
+    }
+
+    protected function createPagesList( $count_pages ) {
+        $pages_list = array();
+        for( $i=1; $i <= $count_pages; $i++ ) {
+            $pages_list[$i] = $i;
+        }
+        return $pages_list;
+    }
+
+    protected function updatePagesList( $pages ) {
+        $table_name = $this->db->prefix.'options';
+
+        if(is_array($pages) && !empty($pages)) {
+            $this->db->update( $table_name,  array( 'option_value' => serialize($pages) ), array( 'option_name' => $this->site_name.'_pages_list' ) );
+        } else {
+            $this->db->update( $table_name,  array( 'option_value' => 1 ), array( 'option_name' => $this->site_name.'_pages_list' ) );
+        }
+    }
+
+    protected function loadPagesList() {
+        $this->get_web_page_html( $this->source_site );
+
+        $count_pages = $this->getCountPages();
+        $pages_list = $this->createPagesList($count_pages);
+        $this->setPagesList($pages_list);
+        die('pages list was loaded');
+    }
+
+    protected function getCountPages() {
+        return 0;
+    }
+
 
 }
 ?>
